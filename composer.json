@@ -1,0 +1,16 @@
+{
+  "name":"aligent/config-lock",
+  "type":"magento-module",
+  "homepage":"https://github.com/aligent/config-lock",
+  "description":"Hashes the value of specified config settings to ensure they haven't been changed.",
+  "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:ircmaxell/password_compat.git"
+        }
+  ],
+  "require":{
+      "magento-hackathon/magento-composer-installer":"*",
+      "ircmaxell/password-compat": "1.0.3"
+  }
+}
