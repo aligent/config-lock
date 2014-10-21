@@ -25,7 +25,7 @@ Add the following to your local.xml file to monitor specific config settings.
         ...
         <aligent_config_lock>
             <contacts>
-                <admin>andrew@aligent.com.au</admin>
+                <admin>admin@email.com</admin>
             </contacts>
             <protected>
                 <store_code_A>
@@ -47,7 +47,9 @@ Cron Job Example
 The following cron job runs every 5 minutes and verified that the config values haven't changed.
 Any validation errors will result in the email recipients coded into the lock file being notified and the cron job returning a failure status code.
 
-To manually run the command to verify that it's working, run `echo $?` immediatelly after to confirm that 0 is returned.  If not, the script should print an error message and return a non 0 status code.
+To manually run the command to verify that it's working, run `echo $?` immediately after to confirm that 0 is returned.  If not, the script should print an error message and return a non 0 status code.
 
-`/5 * * * *  php /MAGENTO_DIR/shell/config_lock.php validate --file /MAGENTO_DIR/app/etc/config.lock`
-
+```
+MAILTO=admin@email.com
+*/5 * * * *  php /MAGENTO_DIR/shell/config_lock.php validate --file /MAGENTO_DIR/app/etc/config.lock
+```
