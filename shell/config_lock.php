@@ -19,7 +19,7 @@ class Config_Lock extends Mage_Shell_Abstract
 
     const PROTECTED_STORES_KEY = 'global/aligent_config_lock/protected';
     const CONTACT_EMAILS_KEY = 'global/aligent_config_lock/contacts';
-    const BCRYPT_COST = 15;
+    const BCRYPT_COST = 7;
 
     public function run() {
 
@@ -77,6 +77,16 @@ class Config_Lock extends Mage_Shell_Abstract
             }
 
             if(count($invalidKeys) > 0) {
+
+                /*
+                 * Check if the mandrill API key was encoded into the lock file. If found, use it to send emails in case
+                 *  it has been modified via the admin to prevent notifications
+                 */
+                if(array_key_exists('mandrillApiKey', $lockData) && !empty($lockData['mandrillApiKey'])) {
+                    Mage::app()->getStore()->setConfig("mandrill/general/apikey", Mage::helper('core')->decrypt($lockData['mandrillApiKey']));
+                    Mage::app()->getStore()->setConfig("mandrill/general/active", 'true');
+                }
+
                 $this->notifyFailures($lockData['emails'], implode(",", $invalidKeys));
                 die(1);
             }
@@ -95,7 +105,6 @@ class Config_Lock extends Mage_Shell_Abstract
      * @param $failures string Failed keys
      */
     protected function notifyFailures($recipients, $failures) {
-
         $emailTemplate = Mage::getModel('core/email_template')->loadByCode(Mage::getStoreConfig('system/cron/error_email_template'));
         $emailTemplate->setIsPlain(true);
         $emailTemplate->sendTransactional(
@@ -128,8 +137,15 @@ class Config_Lock extends Mage_Shell_Abstract
         $protectedStores = $protectedStores->asArray();
         $contacts = $contacts->asArray();
 
+        $mandrillApiKey = null;
+        // Check if mandrill has been enabled and code the credentials into the lock file.
+        if(Mage::getConfig()->getModuleConfig('Ebizmarts_Mandrill')->is('active', 'true') && Mage::getStoreConfig('mandrill/general/active')) {
+            $mandrillApiKey = Mage::helper('core')->encrypt(Mage::getStoreConfig("mandrill/general/apikey"));
+        }
+
         $lockData = array(
             'emails' => $contacts,
+            'mandrillApiKey' => $mandrillApiKey,
             'hashes' => array());
 
         foreach ($protectedStores as $storeCode => $keys) {
