@@ -12,6 +12,6 @@
   "require":{
       "magento-hackathon/magento-composer-installer":"*",
       "ircmaxell/password-compat": "1.0.3",
-      "aoepeople/aoe_scheduler": "1.5.1"
+      "aoepeople/aoe_scheduler": "^1.0.0"
   }
 }
